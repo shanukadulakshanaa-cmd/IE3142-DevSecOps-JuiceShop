@@ -1,9 +1,4 @@
 services:
- dvwa:
-   image: vulnerables/web-dvwa
-   ports:
-     - "8080:80" # DVWA will live at localhost:8080
-   restart: unless-stopped
  juice-shop:
    image: bkimminich/juice-shop
    ports:
