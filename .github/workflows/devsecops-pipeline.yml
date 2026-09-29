@@ -1,0 +1,85 @@
+name: DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  # -------------------------------------------------------------------
+  # Gate 1: SAST (Static Application Security Testing - Semgrep)
+  # -------------------------------------------------------------------
+  sast_scan:
+    name: SAST Scan (Semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Perform Semgrep SAST Scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: p/javascript
+        continue-on-error: true # Set to true to allow pipeline continuation for reporting
+
+  # -------------------------------------------------------------------
+  # Gate 2: Dependency Scanning (npm audit)
+  # -------------------------------------------------------------------
+  dependency_scan:
+    name: Dependency Scan (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run Dependency Audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  # -------------------------------------------------------------------
+  # Gate 3: Secrets Scanning (Gitleaks) - [PIPELINE BLOCKING GATE]
+  # -------------------------------------------------------------------
+  secrets_scan:
+    name: Secrets Scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Secrets Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # This gate will strictly fail and block the pipeline if secrets are detected
+
+  # -------------------------------------------------------------------
+  # Gate 4: Container Scanning (Trivy)
+  # -------------------------------------------------------------------
+  container_scan:
+    name: Container Vulnerability Scan (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Juice Shop Docker Image
+        run: |
+          docker build -t bkimminich/juice-shop:latest .
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'bkimminich/juice-shop:latest'
+          format: 'table'
+          exit-code: '0' # Set to '1' if you want Trivy to fail/block the pipeline on findings
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
