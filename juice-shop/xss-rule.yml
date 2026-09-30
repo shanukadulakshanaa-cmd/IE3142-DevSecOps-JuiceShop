@@ -1,0 +1,7 @@
+rules:
+  - id: angular-bypass-security-trust-html
+    languages:
+      - typescript
+    message: "Potential XSS: bypassSecurityTrustHtml() used with user-controlled input"
+    severity: WARNING
+    pattern: $SANITIZER.bypassSecurityTrustHtml(...)
