@@ -1,0 +1,85 @@
+[1mdiff --git a/Docker/Dockerfile.txt b/Docker/Dockerfile.txt[m
+[1mdeleted file mode 100644[m
+[1mindex b02ed70..0000000[m
+[1m--- a/Docker/Dockerfile.txt[m
+[1m+++ /dev/null[m
+[36m@@ -1,41 +0,0 @@[m
+[31m-FROM node:24 AS installer[m
+[31m-COPY . /juice-shop[m
+[31m-WORKDIR /juice-shop[m
+[31m-RUN npm install -g typescript@^6.0.3[m
+[31m-RUN npm install --omit=dev[m
+[31m-RUN npm dedupe --omit=dev[m
+[31m-RUN rm -rf frontend/node_modules[m
+[31m-RUN rm -rf frontend/.angular[m
+[31m-RUN rm -rf frontend/src/assets[m
+[31m-RUN mkdir logs[m
+[31m-RUN chown -R 65532 logs[m
+[31m-RUN chgrp -R 0 ftp/ frontend/dist/ logs/ data/ i18n/[m
+[31m-RUN chmod -R g=u ftp/ frontend/dist/ logs/ data/ i18n/[m
+[31m-RUN rm ftp/legal.md || true[m
+[31m-RUN rm i18n/*.json || true[m
+[31m-[m
+[31m-# keep version in sync with package.json[m
+[31m-ARG CYCLONEDX_NPM_VERSION='^2.0.0||^3.0.0||^4.0.0'[m
+[31m-RUN npm install -g @cyclonedx/cyclonedx-npm@$CYCLONEDX_NPM_VERSION[m
+[31m-RUN npm run sbom[m
+[31m-[m
+[31m-FROM gcr.io/distroless/nodejs24-debian13[m
+[31m-ARG BUILD_DATE[m
+[31m-ARG VCS_REF[m
+[31m-LABEL maintainer="Bjoern Kimminich <bjoern.kimminich@owasp.org>" \[m
+[31m-    org.opencontainers.image.title="OWASP Juice Shop" \[m
+[31m-    org.opencontainers.image.description="Probably the most modern and sophisticated insecure web application" \[m
+[31m-    org.opencontainers.image.authors="Bjoern Kimminich <bjoern.kimminich@owasp.org>" \[m
+[31m-    org.opencontainers.image.vendor="Open Worldwide Application Security Project" \[m
+[31m-    org.opencontainers.image.documentation="https://help.owasp-juice.shop" \[m
+[31m-    org.opencontainers.image.licenses="MIT" \[m
+[31m-    org.opencontainers.image.version="20.2.0" \[m
+[31m-    org.opencontainers.image.url="https://owasp-juice.shop" \[m
+[31m-    org.opencontainers.image.source="https://github.com/juice-shop/juice-shop" \[m
+[31m-    org.opencontainers.image.revision=$VCS_REF \[m
+[31m-    org.opencontainers.image.created=$BUILD_DATE[m
+[31m-WORKDIR /juice-shop[m
+[31m-COPY --from=installer --chown=65532:0 /juice-shop .[m
+[31m-USER 65532[m
+[31m-EXPOSE 3000[m
+[31m-CMD ["/juice-shop/build/app.js"][m
+[1mdiff --git a/Docker/docker-compose.yml b/Docker/docker-compose.yml[m
+[1mdeleted file mode 100644[m
+[1mindex ee62eaf..0000000[m
+[1m--- a/Docker/docker-compose.yml[m
+[1m+++ /dev/null[m
+[36m@@ -1,6 +0,0 @@[m
+[31m-services:[m
+[31m- juice-shop:[m
+[31m-   image: bkimminich/juice-shop[m
+[31m-   ports:[m
+[31m-     - "3000:3000" # Juice Shop will live at localhost:3000[m
+[31m-   restart: unless-stopped[m
+[1mdiff --git a/Docs/Architecture/readme.txt b/Docs/Architecture/readme.txt[m
+[1mdeleted file mode 100644[m
+[1mindex 9daeafb..0000000[m
+[1m--- a/Docs/Architecture/readme.txt[m
+[1m+++ /dev/null[m
+[36m@@ -1 +0,0 @@[m
+[31m-test[m
+[1mdiff --git a/screenshots/1.jpg b/screenshots/1.jpg[m
+[1mdeleted file mode 100644[m
+[1mindex b236cda..0000000[m
+Binary files a/screenshots/1.jpg and /dev/null differ
+[1mdiff --git a/screenshots/2.jpg b/screenshots/2.jpg[m
+[1mdeleted file mode 100644[m
+[1mindex e2a1bd6..0000000[m
+Binary files a/screenshots/2.jpg and /dev/null differ
+[1mdiff --git a/screenshots/3.jpg b/screenshots/3.jpg[m
+[1mdeleted file mode 100644[m
+[1mindex 38a0ab0..0000000[m
+Binary files a/screenshots/3.jpg and /dev/null differ
+[1mdiff --git a/screenshots/readme.txt b/screenshots/readme.txt[m
+[1mdeleted file mode 100644[m
+[1mindex 9daeafb..0000000[m
+[1m--- a/screenshots/readme.txt[m
+[1m+++ /dev/null[m
+[36m@@ -1 +0,0 @@[m
+[31m-test[m
